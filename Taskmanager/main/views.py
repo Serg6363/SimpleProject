@@ -17,10 +17,14 @@ def make_task(request):
         if form.is_valid():
             form.save()
 
+            title = Task.title
+            task = request.POST['task']
+
             html_content = render_to_string(
                 'main/task_created.html',
                 {
-                    'task': TaskForm,
+                    'title': title,
+                    'task': task,
                 }
             )
 
