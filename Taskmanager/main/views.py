@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Task
 from .forms import TaskForm
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import mail_admins
 from django.template.loader import render_to_string
 
 
@@ -17,28 +17,34 @@ def make_task(request):
         if form.is_valid():
             form.save()
 
-            title = Task.title
-            task = request.POST['task']
-
-            html_content = render_to_string(
-                'main/task_created.html',
-                {
-                    'title': title,
-                    'task': task,
-                }
+            mail_admins(
+                subject=f'{form.cleaned_data["title"]}',
+                message=form.cleaned_data['task'],
             )
-
-            msg = EmailMultiAlternatives(
-                subject=f'Новая запись: {form.cleaned_data["title"]}',
-                body=form.cleaned_data['task'],
-                from_email='mi5sing@yandex.ru',
-                to=['sergei.dd11@gmail.com', ],
-            )
-            msg.attach_alternative(html_content, "text/html")
-
-            msg.send()
 
             return redirect('home')
+            # title = Task.title
+            # task = request.POST['task']
+            # #
+            # # html_content = render_to_string(
+            # #     'main/task_created.html',
+            # #     {
+            # #         'title': title,
+            # #         'task': task,
+            # #     }
+            # # )
+            # #
+            # # msg = EmailMultiAlternatives(
+            # #     subject=f'Новая запись: {form.cleaned_data["title"]}',
+            # #     body=form.cleaned_data['task'],
+            # #     from_email='mi5sing@yandex.ru',
+            # #     to=['sergei.dd11@gmail.com', ],
+            # # )
+            # # msg.attach_alternative(html_content, "text/html")
+            # #
+            # # msg.send()
+            # #
+            # # return redirect('home')
         else:
             error = 'Форма заполнена не верно'
 
